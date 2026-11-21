@@ -154,16 +154,16 @@ function runGame() {
     const mousePos = input.getMousePos();
     
     if (actions & ACTION_CONFIRM) {
-      if (screen === SCREEN_TITLE || screen === SCREEN_OVER) {
-        startGame();
-      } else if (screen === SCREEN_PLAY) {
-        const result = world.checkClick(mousePos.x, mousePos.y, canvas.width, canvas.height);
-        if (result.hit) {
-          if (result.event & EVENT_FOUND) {
-            renderer.triggerFoundAnimation(result.index);
-            showToast('Difference found!', 'success');
-            announce(`Found! ${world.state.foundCount} of ${world.state.totalDifferences}.`);
-          }
+          if (screen === SCREEN_TITLE || screen === SCREEN_OVER) {
+            startGame();
+          } else if (screen === SCREEN_PLAY) {
+            const result = world.checkClick(mousePos.x, mousePos.y, canvas.width, canvas.height);
+            if (result.hit) {
+              if (result.event & EVENT_FOUND) {
+                renderer.triggerFoundAnimation(result.index, result.x, result.y);
+                showToast('Difference found!', 'success');
+                announce(`Found! ${world.state.foundCount} of ${world.state.totalDifferences}.`);
+              }
           if (result.event & EVENT_LEVEL_COMPLETE) {
             completeLevel();
           }
@@ -258,17 +258,17 @@ function runGame() {
   });
 
   canvas.addEventListener('click', (e) => {
-    if (screen === SCREEN_PLAY) {
-      const rect = canvas.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-      const result = world.checkClick(x, y, canvas.width, canvas.height);
-      if (result.hit) {
-        if (result.event & EVENT_FOUND) {
-          renderer.triggerFoundAnimation(result.index);
-          showToast('Difference found!', 'success');
-          announce(`Found! ${world.state.foundCount} of ${world.state.totalDifferences}.`);
-        }
+      if (screen === SCREEN_PLAY) {
+        const rect = canvas.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        const result = world.checkClick(x, y, canvas.width, canvas.height);
+        if (result.hit) {
+          if (result.event & EVENT_FOUND) {
+            renderer.triggerFoundAnimation(result.index, result.x, result.y);
+            showToast('Difference found!', 'success');
+            announce(`Found! ${world.state.foundCount} of ${world.state.totalDifferences}.`);
+          }
         if (result.event & EVENT_LEVEL_COMPLETE) {
           completeLevel();
         }

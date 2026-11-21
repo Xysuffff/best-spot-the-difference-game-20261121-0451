@@ -11,7 +11,8 @@ export function createRenderer(canvas) {
   let lastWidth = 0;
   let lastHeight = 0;
   let hintPulse = 0;
-  let foundAnimations = [];
+    let foundAnimations = [];
+    let celebrationParticles = [];
 
   function resize(width, height) {
     dpr = window.devicePixelRatio || 1;
@@ -1186,21 +1187,33 @@ export function createRenderer(canvas) {
   }
 
   function drawHintIndicator(hintData, layout, canvasSize) {
-    if (!hintData) return;
-    const x = layout.leftOffset + hintData.x * canvasSize;
-    const y = CANVAS_PADDING + hintData.y * canvasSize;
-    ctx.save();
-    ctx.translate(x, y);
-    const pulse = Math.sin(hintPulse * Math.PI * 4) * 0.5 + 0.5;
-    ctx.strokeStyle = '#fbbf24';
-    ctx.lineWidth = 3 + pulse * 2;
-    ctx.globalAlpha = 0.6 + pulse * 0.4;
-    ctx.beginPath();
-    ctx.arc(0, 0, HINT_RADIUS, 0, Math.PI * 2);
-    ctx.stroke();
-    ctx.globalAlpha = 1;
-    ctx.restore();
-  }
+      if (!hintData) return;
+      const x = layout.leftOffset + hintData.x * canvasSize;
+      const y = CANVAS_PADDING + hintData.y * canvasSize;
+      ctx.save();
+      ctx.translate(x, y);
+      const pulse = Math.sin(hintPulse * Math.PI * 4) * 0.5 + 0.5;
+      ctx.strokeStyle = '#fbbf24';
+      ctx.lineWidth = 3 + pulse * 2;
+      ctx.globalAlpha = 0.6 + pulse * 0.4;
+      ctx.beginPath();
+      ctx.arc(0, 0, HINT_RADIUS, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.globalAlpha = 1;
+      ctx.restore();
+    }
+
+    function drawCelebrationParticles() {
+      for (const p of celebrationParticles) {
+        ctx.save();
+        ctx.globalAlpha = p.life;
+        ctx.fillStyle = p.color;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.size * p.life, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+    }
 
   function drawUI(state, layout, canvasSize, width, height) {
     // UI is drawn in HTML, not canvas
@@ -1227,10 +1240,11 @@ export function createRenderer(canvas) {
           drawScene('right', width, height, state.palette, state.sceneElements.right, state.differences, state.found, hintData || state.hintData);
         
         if (screen === SCREEN_PLAY) {
-          drawMarkers(state.differences, state.found, layout, state.canvasWidth);
-          drawFoundMarkers(state.differences, state.found, layout, state.canvasWidth);
-          drawHintIndicator(state.hintData, layout, state.canvasWidth);
-        }
+                  drawMarkers(state.differences, state.found, layout, state.canvasWidth);
+                  drawFoundMarkers(state.differences, state.found, layout, state.canvasWidth);
+                  drawHintIndicator(state.hintData, layout, state.canvasWidth);
+                  drawCelebrationParticles();
+                }
       }
     }
 
@@ -1246,10 +1260,19 @@ export function createRenderer(canvas) {
     if (hintPulse > 1) hintPulse = 0;
 
     foundAnimations = foundAnimations.filter(a => {
-      a.progress += 1 / 30;
-      return a.progress < 1;
-    });
-  }
+          a.progress += 1 / 30;
+          return a.progress < 1;
+        });
+
+        // Update celebration particles
+        celebrationParticles = celebrationParticles.filter(p => {
+          p.life -= 1 / 60;
+          p.x += p.vx;
+          p.y += p.vy;
+          p.vy += 0.02; // gravity
+          return p.life > 0;
+        });
+      }
 
   function drawTitleScreen(width, height, best) {
     ctx.fillStyle = 'rgba(10,12,16,0.9)';
@@ -1305,9 +1328,27 @@ export function createRenderer(canvas) {
     return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
   }
 
-  function triggerFoundAnimation(index) {
-    foundAnimations.push({ index, progress: 0 });
-  }
+  function triggerFoundAnimation(index, normX, normY) {
+        foundAnimations.push({ index, progress: 0 });
+        // Create celebration particles at the difference position
+        if (normX !== undefined && normY !== undefined) {
+          const layout = { leftOffset: CANVAS_PADDING, rightOffset: CANVAS_PADDING + 800 + 8, canvasSize: 800 };
+          // We don't have access to layout here, so we'll set a default and update in draw
+          for (let i = 0; i < 12; i++) {
+            const angle = (Math.PI * 2 * i) / 12;
+            const speed = 2 + Math.random() * 3;
+            celebrationParticles.push({
+              x: normX * 800, // approximate, will be corrected in draw
+              y: normY * 800,
+              vx: Math.cos(angle) * speed,
+              vy: Math.sin(angle) * speed - 2,
+              life: 1.0,
+              color: `hsl(${Math.random() * 60 + 30}, 100%, 60%)`,
+              size: 3 + Math.random() * 3
+            });
+          }
+        }
+      }
 
   return { draw, resize, triggerFoundAnimation };
 }

@@ -186,15 +186,15 @@ export function createWorld(random) {
       const radiusNorm = DIFFERENCE_RADIUS / layout.canvasSize;
       
       if (dist <= radiusNorm) {
-        state.found[i] = true;
-        diff.found = true;
-        const allFound = state.found.every(f => f);
-        if (allFound) {
-          state.paused = true;
-          return { hit: true, event: EVENT_FOUND | EVENT_LEVEL_COMPLETE, index: i };
-        }
-        return { hit: true, event: EVENT_FOUND, index: i };
-      }
+              state.found[i] = true;
+              diff.found = true;
+              const allFound = state.found.every(f => f);
+              if (allFound) {
+                state.paused = true;
+                return { hit: true, event: EVENT_FOUND | EVENT_LEVEL_COMPLETE, index: i, x: diff.x, y: diff.y };
+              }
+              return { hit: true, event: EVENT_FOUND, index: i, x: diff.x, y: diff.y };
+            }
     }
 
     state.mistakes++;
