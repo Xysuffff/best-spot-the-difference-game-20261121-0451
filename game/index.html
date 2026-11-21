@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Twin Canvas — Spot the Difference</title>
+<style>
+  html, body { margin: 0; height: 100%; overflow: hidden; background: #0d0f14; font-family: system-ui, sans-serif; color: #e8e8e8; }
+  #game { position: fixed; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; }
+  #ui { position: fixed; inset: 0; pointer-events: none; z-index: 10; }
+  #ui > * { pointer-events: auto; }
+  #hud { position: absolute; top: 12px; left: 50%; transform: translateX(-50%); display: flex; gap: 24px; align-items: center; font-size: 14px; font-weight: 600; letter-spacing: 0.5px; }
+  .hud-item { display: flex; align-items: center; gap: 6px; background: rgba(15,18,24,0.85); padding: 6px 12px; border-radius: 6px; border: 1px solid #2a2f3a; backdrop-filter: blur(4px); }
+  .hud-label { color: #8b93a3; font-size: 11px; text-transform: uppercase; letter-spacing: 0.8px; }
+  .hud-value { color: #f0f0f0; font-variant-numeric: tabular-nums; }
+  .hud-value.found { color: #4ade80; }
+  .hud-value.remaining { color: #f87171; }
+  .hud-value.level { color: #60a5fa; }
+  #timer { color: #fbbf24; }
+  #timer.warning { color: #f87171; animation: pulse 1s infinite; }
+  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.5; } }
+  #hint-btn { position: absolute; top: 12px; right: 12px; background: rgba(15,18,24,0.85); border: 1px solid #2a2f3a; border-radius: 6px; padding: 8px 14px; color: #e8e8e8; font-size: 13px; font-weight: 600; cursor: pointer; backdrop-filter: blur(4px); transition: all 0.15s; }
+  #hint-btn:hover:not(:disabled) { background: rgba(30,35,45,0.95); border-color: #3b4252; transform: translateY(-1px); }
+  #hint-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  #hint-btn .hint-count { color: #fbbf24; margin-left: 6px; }
+  #level-complete { position: absolute; inset: 0; display: none; flex-direction: column; align-items: center; justify-content: center; gap: 16px; background: rgba(10,12,16,0.92); backdrop-filter: blur(8px); z-index: 20; }
+  #level-complete.visible { display: flex; }
+  #level-complete h2 { margin: 0; font-size: 32px; font-weight: 700; background: linear-gradient(135deg, #4ade80, #22d3ee); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; text-shadow: 0 0 30px rgba(34,211,238,0.3); }
+  #level-complete .stats { display: flex; gap: 32px; font-size: 16px; color: #b0b8c8; }
+  #level-complete .stat { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+  #level-complete .stat-label { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #6a7285; }
+  #level-complete .stat-value { font-weight: 700; font-variant-numeric: tabular-nums; color: #f0f0f0; }
+  #level-complete button { background: linear-gradient(135deg, #1e293b, #0f172a); border: 1px solid #334155; color: #e8e8e8; font-size: 15px; font-weight: 600; padding: 12px 32px; border-radius: 8px; cursor: pointer; transition: all 0.15s; }
+  #level-complete button:hover { background: linear-gradient(135deg, #334155, #1e293b); border-color: #475569; transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.4); }
+  #game-over { position: absolute; inset: 0; display: none; flex-direction: column; align-items: center; justify-content: center; gap: 16px; background: rgba(10,12,16,0.95); backdrop-filter: blur(12px); z-index: 30; }
+  #game-over.visible { display: flex; }
+  #game-over h2 { margin: 0; font-size: 36px; font-weight: 700; background: linear-gradient(135deg, #f87171, #fb923c); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+  #game-over .final-stats { display: flex; gap: 40px; font-size: 18px; }
+  #game-over .stat { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+  #game-over .stat-label { font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: #6a7285; }
+  #game-over .stat-value { font-weight: 700; color: #f0f0f0; }
+  #game-over .stat-value.best { color: #4ade80; }
+  #game-over button { background: linear-gradient(135deg, #1e293b, #0f172a); border: 1px solid #334155; color: #e8e8e8; font-size: 15px; font-weight: 600; padding: 12px 32px; border-radius: 8px; cursor: pointer; transition: all 0.15s; }
+  #game-over button:hover { background: linear-gradient(135deg, #334155, #1e293b); border-color: #475569; transform: translateY(-2px); }
+  #toast { position: absolute; bottom: 32px; left: 50%; transform: translateX(-50%) translateY(100px); background: rgba(15,18,24,0.95); border: 1px solid #2a2f3a; border-radius: 8px; padding: 10px 20px; font-size: 14px; font-weight: 500; color: #e8e8e8; opacity: 0; transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); z-index: 15; pointer-events: none; backdrop-filter: blur(8px); }
+  #toast.visible { transform: translateX(-50%) translateY(0); opacity: 1; }
+  #toast.success { border-color: #4ade80; box-shadow: 0 0 20px rgba(74,222,128,0.3); }
+  #toast.error { border-color: #f87171; box-shadow: 0 0 20px rgba(248,113,113,0.3); }
+  #toast.hint { border-color: #fbbf24; box-shadow: 0 0 20px rgba(251,191,36,0.3); }
+  @media (max-width: 900px) {
+    #hud { gap: 12px; font-size: 12px; }
+    .hud-item { padding: 4px 8px; }
+    #hint-btn { top: 8px; right: 8px; padding: 6px 10px; font-size: 12px; }
+  }
+  @media (max-height: 600px) {
+    #hud { top: 6px; }
+    #hint-btn { top: 6px; }
+  }
+</style>
+</head>
+<body>
+<canvas id="game" aria-label="Twin Canvas: spot the differences between two side-by-side scenes"></canvas>
+<div id="ui">
+  <div id="hud">
+    <div class="hud-item"><span class="hud-label">Level</span><span class="hud-value level" id="level-display">1</span></div>
+    <div class="hud-item"><span class="hud-label">Found</span><span class="hud-value found" id="found-count">0</span></div>
+    <div class="hud-item"><span class="hud-label">Remaining</span><span class="hud-value remaining" id="remaining-count">0</span></div>
+    <div class="hud-item"><span class="hud-label">Time</span><span class="hud-value" id="timer">00:00</span></div>
+  </div>
+  <button id="hint-btn" aria-label="Use a hint">Hint <span class="hint-count" id="hint-count">3</span></button>
+  <div id="level-complete" role="status" aria-live="polite">
+    <h2>Level Complete!</h2>
+    <div class="stats">
+      <div class="stat"><span class="stat-label">Time</span><span class="stat-value" id="lc-time">00:00</span></div>
+      <div class="stat"><span class="stat-label">Hints Used</span><span class="stat-value" id="lc-hints">0</span></div>
+      <div class="stat"><span class="stat-label">Mistakes</span><span class="stat-value" id="lc-mistakes">0</span></div>
+    </div>
+    <button id="next-level-btn">Next Level</button>
+  </div>
+  <div id="game-over" role="status" aria-live="polite">
+    <h2>All Levels Complete</h2>
+    <div class="final-stats">
+      <div class="stat"><span class="stat-label">Total Time</span><span class="stat-value" id="go-total-time">00:00</span></div>
+      <div class="stat"><span class="stat-label">Total Hints</span><span class="stat-value" id="go-total-hints">0</span></div>
+      <div class="stat"><span class="stat-label">Total Mistakes</span><span class="stat-value" id="go-total-mistakes">0</span></div>
+      <div class="stat"><span class="stat-label">Best Time</span><span class="stat-value best" id="go-best-time">--:--</span></div>
+    </div>
+    <button id="restart-btn">Play Again</button>
+  </div>
+  <div id="toast" role="status" aria-live="polite" aria-atomic="true"></div>
+</div>
+<script type="module" src="./src/main.js"></script>
+</body>
+</html>

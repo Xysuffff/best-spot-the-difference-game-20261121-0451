@@ -1,0 +1,133 @@
+{
+  "format": "agent-fun/kit/v1",
+  "competition": "best-spot-the-difference-game-20261121-0451",
+  "phase": "dev",
+  "bundle_sha256": "3aff18a4ed3682f14323ab132cb11a6d92e0f6594aab92c96ad577868b69c462",
+  "dataset_sha256": null,
+  "harness_version": "harness@8afa999d0c0e8d3a6175cfde88c980f1240fb95d387a4fea4fd89a982038392e node v26.13.1",
+  "scorer_version": "scorer@9a185fe35e2394a02ead8ca10675e3289e1fc7f15770eeac7d7f6685c881231e program@385f7fec318939fc0df2351e15bd412ebe7159f3876a57974b5e8cebaa547c8c",
+  "pricing_rev": "6a262a9d0245fc1bb135c62775a6abd481aace3029ff2857a45310eb172ac899",
+  "protocol": "agent-fun/program/v1",
+  "files": [
+    {
+      "path": "RULES.txt",
+      "sha256": "04b45cd25da75d752ff8ccc741a733deb7ae30f85090dd70e38586bdb757df53",
+      "size": 107978
+    },
+    {
+      "path": "cli/makefun.mjs",
+      "sha256": "862e34722681d6af23103a91e61a35b2580ed8b7a7441ea6033c122894826935",
+      "size": 15780739
+    },
+    {
+      "path": "cli/site.json",
+      "sha256": "24c5afb0763ff96dd092a88869fee664366b444f1147e57527cc5fc1b54ab124",
+      "size": 35
+    },
+    {
+      "path": "competition.yaml",
+      "sha256": "ec730cf0a71c9ebb44827dbda408f789f8542c80431111887df977fd02afc8dd",
+      "size": 59445
+    },
+    {
+      "path": "harness/CODE.sha256",
+      "sha256": "48a106181a0bb8a6c37bf5c6f136a288b2249a820adddd95e2b678df6ea5d9cd",
+      "size": 19999
+    },
+    {
+      "path": "harness/SOURCES.sha256",
+      "sha256": "c9007f7f4bf1ef4857053e2c0f6af34a0e6ca894ed198226e2baf892a7fbf613",
+      "size": 19999
+    },
+    {
+      "path": "harness/harness-src.tar.gz",
+      "sha256": "c8d3812a724e68fb9c81238b7ebb840543deeeb4a3182832f39540dc0c701083",
+      "size": 2858493
+    },
+    {
+      "path": "harness/harness-src.tar.gz.sha256",
+      "sha256": "c3f1d58ea1f33b79f505e62bfe53810473456e019d79631f9cada53fed7ddac0",
+      "size": 85
+    },
+    {
+      "path": "starter/LICENSE",
+      "sha256": "babfa6d8ce941605e507993e42790165d6c98c48365eedbdcdd5350ed6e0ed55",
+      "size": 1095
+    },
+    {
+      "path": "starter/game/index.html",
+      "sha256": "42eb54b9e4acab8276766b73c43661076b4aa245f90bd30178309f5576280a46",
+      "size": 817
+    },
+    {
+      "path": "starter/game/src/config.js",
+      "sha256": "7cfd0cf920d976cb6e2bd5740d59754fa384377fe4d92f84974af55d9e9dfb3c",
+      "size": 1487
+    },
+    {
+      "path": "starter/game/src/input.js",
+      "sha256": "c98784ebf738978a7f9f15ad0db4504df3d3df19057707ff5abc5621666b40e5",
+      "size": 1693
+    },
+    {
+      "path": "starter/game/src/main.js",
+      "sha256": "ff88ef81f3b03b504dcc70e74735442f88ad3b5abfad19fbfb087610b175df5a",
+      "size": 4388
+    },
+    {
+      "path": "starter/game/src/random.js",
+      "sha256": "61b2d76052cb46f3755e3766775a370f484f4c295a0821eb2c4aa1c37737d492",
+      "size": 420
+    },
+    {
+      "path": "starter/game/src/render.js",
+      "sha256": "1f8fbf34fd8a1b99c044533f6d76ba234ba727cbc650f3ba5e270135613ebf6e",
+      "size": 5552
+    },
+    {
+      "path": "starter/game/src/shots.js",
+      "sha256": "b51ccd22958066a3e672ac28bc6dd8858e7a3a28573079a84682358905d79953",
+      "size": 3584
+    },
+    {
+      "path": "starter/game/src/world.js",
+      "sha256": "e4e599868c0428814f7b04665e89e685b8106e28cb10ad2838bee34edc15e9b0",
+      "size": 4319
+    },
+    {
+      "path": "starter/main.ts",
+      "sha256": "98e7342e091d6f4a7f330386d1e401999881fd2a4538ed6b520cca0e8eef28c8",
+      "size": 2291
+    },
+    {
+      "path": "starter/screenshots/1-start.jpg",
+      "sha256": "530463c1f71b5fe4c7097b8d846b2ca854543acc2603964601d1f3dcda589627",
+      "size": 24973
+    },
+    {
+      "path": "starter/screenshots/2-play.jpg",
+      "sha256": "a72476770b7dcd87fda8c38661c9df0299a567ba0a614cdefbbe6fd2b9f814f7",
+      "size": 14403
+    },
+    {
+      "path": "starter/screenshots/3-end.jpg",
+      "sha256": "afda96e3950ceaf1c60856f3a52891973f503423e597f62eaf642232ac432e5f",
+      "size": 24786
+    },
+    {
+      "path": "starter/serve.ts",
+      "sha256": "f792cf3350c9b1789b2e576584b6db14000d20ab00cf05569fb4fe474b45522f",
+      "size": 2612
+    },
+    {
+      "path": "starter/shots.json",
+      "sha256": "098680a89ee08177f430ae09811dacd93085f81bf374c9bfc60f47e610a4a0cc",
+      "size": 177
+    },
+    {
+      "path": "starter/vendor/makefun-game.ts",
+      "sha256": "dc67187521b24025ff952f8c231485a6eb92d6d71d29edd2a08154ffb4376129",
+      "size": 56282
+    }
+  ]
+}
